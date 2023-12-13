@@ -1,0 +1,58 @@
+// 下单模型
+var order_model_uk = "c2a374634bea42bb8fed6835f630391e";
+// 下单中明细属性
+var order_detail_uk = "685807b5efd64b81b0a36fd968447bf1";
+// 下单中商品货号
+var order_text_uk = "fe8fbc2671d2400f99d5c812486799cd";
+
+// 下单明细
+var orderDetail_model_uk = "44a8bf584dcf4a52903b68bf53589a73";
+var orderDetail_text_uk = "e316c45b679e487eb9c152d576ac5764";
+var orderDetail_aggregate_uk = "270881d3fbb549898bd98facd9b6a602";
+var SYSTEM_ITMES = "items";
+var SYSTEM_ID = "_id";
+var SYSTEM_MODEL = "_modelUniqueKey";
+var SYSTEM_ITEMS = "items";
+var SYSTEM_CONTENT = "content";
+
+
+var orderData = args.request.data;
+
+var result;
+do {
+
+    //dataRepository.begin(context);
+    // 全部是创建
+    var orderItemMap = {};
+    orderItemMap[order_text_uk] = "jstest2";
+    // 订单生命周期
+    orderItemMap['_lifecycleInstance'] = {'status':'WAITING','states':[{'uniqueKey':'st0xDJGEw5maVEzk','status':'WAITING','activities':[]}]};
+    console.log("order is " + JSON.stringify(orderItemMap));
+    var createOrderId = dataRepository.save(context, order_model_uk, orderItemMap);
+
+
+    for(let index = 0; index < 10; index++) {
+     let detailCreateItem = {};
+    detailCreateItem[orderDetail_aggregate_uk] = createOrderId;
+    detailCreateItem[orderDetail_text_uk] = "orderDetail js test";
+    detailCreateItem['_lifecycleInstance'] = {'status':'WAITING','states':[{'uniqueKey':'st0xCnhKQrywj72D','status':'WAITING','activities':[]}]};
+    console.log("detailItem is " + JSON.stringify(detailCreateItem));
+    let detailItemId = dataRepository.save(context, orderDetail_model_uk, detailCreateItem);
+
+    // 订单中增加明细
+    dataRepository.recordOneToMany(context, order_model_uk, createOrderId, order_detail_uk, "items",detailItemId);
+    }
+
+    var updateItem = {};
+    updateItem['_version'] = 1;
+    var updateId = '65080a83748012524d7cb164';
+    updateItem[SYSTEM_ID] = updateId;
+    updateItem[orderDetail_text_uk] = "orderDetail js updateTest.";
+    dataRepository.update(context, orderDetail_model_uk, updateId, updateItem);
+
+    //dataRepository.commit(context);
+    result = {'success': true, 'code': '200'}; 
+} while (false);
+
+result
+

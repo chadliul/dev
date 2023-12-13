@@ -1,0 +1,35 @@
+{
+    "zvbeln_srm":{
+        "attributeIndex":["a70c847b196d40ae90a665d914ff1936"]
+    },
+    "wareHouse":{
+        "attributeIndex":["014a92c31b5942fe82988840363ae1da"]
+    },
+    "create_date":{
+        "attributeIndex":["4baacb65bc744ae798bc04ea7040ffde","$get(\"start\")"],
+        "dataType": "textual"
+    },
+    "sys_sub_info":{
+        "attributeIndex":["ca4297457dbc49a181d17610cebb364b"],
+        "variableBindings":{
+            "ebeln":{
+                "attributeIndex":["b0ba841105594cd596bcec5c2faf7e21"]
+            },
+            "matCode":{
+                "attributeIndex":["e315679bb5ff4d49adcc275289c77ba5"]
+            },
+            "menge":{
+                "attributeIndex":["796e3c7d83f4475ba5f550b4eb4e2c4c"]
+            },
+            "matName":{
+                "attributeIndex":["959927b4d8d44f56b43aff93d73b3601"]
+            },
+            "ablad":{
+                "attributeIndex":["52411733589147559533506f625dff2c"]
+            },
+            "mblnr":{
+                "attributeIndex":["d771896f6a1f4ae6819902f068009ff8"]
+            }
+        }
+    }
+}

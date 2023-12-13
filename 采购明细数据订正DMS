@@ -1,0 +1,91 @@
+ aliyun:
+  db.data_07e9406b17a7431881c8eb56cb975a70_sandbox.aggregate([
+    { 
+    "$project" : {
+    'sendTotal' : {$ifNull:['$e4cfb8d010e64feca0b2b5cc937789ca', NumberDecimal('0.00')]},
+    'sendingTotal' : {$ifNull:['$1dbbfc9cfbdd49dcb7727709828662ef', NumberDecimal('0.00')]},
+    'orderTotal' : {$ifNull:['$677a75ed5c994161a547567421db07b9', NumberDecimal('0.00')]},
+    '_lifecycleInstance':1,
+    'total' : { $add : [ {$ifNull:['$e4cfb8d010e64feca0b2b5cc937789ca', NumberDecimal('0.00')]}, 
+    {$ifNull:['$1dbbfc9cfbdd49dcb7727709828662ef', NumberDecimal('0.00')]} ] }}
+  },{$match:{$expr:{$gte:["$total", "$orderTotal"]}}}])
+
+
+  // 全部更新可送货
+  db.data_07e9406b17a7431881c8eb56cb975a70_sandbox.updateMany( {},
+    {$set:{'_lifecycleInstance':{
+        status: 'WAITING',
+        states: [
+          {
+            uniqueKey: '7af5d05e10cf11ed8d154a29d0e817e0',
+            status: 'WAITING',
+            activities: []
+          }
+        ]
+      }}})
+
+// 筛选已送货
+db.data_07e9406b17a7431881c8eb56cb975a70_sandbox.aggregate([
+    { 
+    "$project" : {
+    'orderTotal' : {$ifNull:['$677a75ed5c994161a547567421db07b9', NumberDecimal('0.00')]},
+    'total' : { $add : [ {$ifNull:['$e4cfb8d010e64feca0b2b5cc937789ca', NumberDecimal('0.00')]}, 
+    {$ifNull:['$1dbbfc9cfbdd49dcb7727709828662ef', NumberDecimal('0.00')]} ] }}
+  },{$match:{$expr:{$gte:["$total", "$orderTotal"]}}}])
+
+
+  cat detail_preview_send_6| grep ObjectId | awk '{print $2}' |  awk BEGIN{RS=EOF}'{gsub(/\n/,"");print}'
+
+// 根据id更新已送货
+db.data_07e9406b17a7431881c8eb56cb975a70_sandbox.updateMany( {_id : {$in: [ObjectId("6376d335aab28b0312bf5168"),ObjectId("6386d7b88d8d603d8eb004b1"),ObjectId("63928b97f9569179bc5ad774"),ObjectId("63b56e0f717b3f00a1b1d4bc"),ObjectId("63b56e0f717b3f00a1b1d4bd"),ObjectId("63bfeede6725337f79a124c5")]}},
+    {$set:{'_lifecycleInstance':{
+        status: 'WAITING',
+        states: [
+          {
+            uniqueKey: '7af5d06810cf11ed8d154a29d0e817e0',
+            status: 'WAITING',
+            activities: []
+          }
+        ]
+      }}})
+
+
+    db.data_07e9406b17a7431881c8eb56cb975a70_sandbox.aggregate([
+      { 
+      "$project" : {
+      'sendTotal' : {$ifNull:['$e4cfb8d010e64feca0b2b5cc937789ca', NumberDecimal('0.00')]},
+      'sendingTotal' : {$ifNull:['$1dbbfc9cfbdd49dcb7727709828662ef', NumberDecimal('0.00')]},
+      'orderTotal' : {$ifNull:['$677a75ed5c994161a547567421db07b9', NumberDecimal('0.00')]},
+      '_lifecycleInstance':1,
+      'total' : { $add : [ {$ifNull:['$e4cfb8d010e64feca0b2b5cc937789ca', NumberDecimal('0.00')]}, 
+      {$ifNull:['$1dbbfc9cfbdd49dcb7727709828662ef', NumberDecimal('0.00')]} ] }}
+    },{$match:{$expr:{$lte:["$total", "$orderTotal"]}}}]).forEach( function(doc) {
+      db.data_07e9406b17a7431881c8eb56cb975a70_sandbox.updateOne({'_id': ObjectId(doc._id)},
+  );
+    } )
+
+
+aliyun:
+已送货
+ {
+  status: 'WAITING',
+  states: [
+    {
+      uniqueKey: '7af5d06810cf11ed8d154a29d0e817e0',
+      status: 'WAITING',
+      activities: []
+    }
+  ]
+}
+
+可送货
+{
+  status: 'WAITING',
+  states: [
+    {
+      uniqueKey: '7af5d05e10cf11ed8d154a29d0e817e0',
+      status: 'WAITING',
+      activities: []
+    }
+  ]
+}

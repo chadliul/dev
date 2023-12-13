@@ -1,0 +1,119 @@
+// 同步供应商数据
+var SUPPLIER_MODEL_UK = "ac8cb6f6e8984abea6004c4bffce5591";
+var DATA_ID = "_id";
+var SYSTEM_MODEL = "_modelUniqueKey";
+var SYSTEM_VERSION = "_version";
+var SYSTEM_CONTENT = "content";
+var SUPPLIER_GROUP_ALIAS = "supplierAccountGrp";
+var SUPPLIER_BANKS_ALIAS = "banks";
+var ITEMS_ATTRIBUTE_NAME = "items";
+var ITEMS_BANKT_ALIAS = "bkont";
+var ITEMS_ISBILL_ALIAS = "isBillBank";
+var REQUEST_SIGN_API_NAME = "sendApi";
+var SUPPLIER_TAG = "suppliers";
+var SUPPLIER_TYPE_ENUM = {
+    "ZR01": "96ed97f52b864e8abc8ccf21a3b6cba8",
+    "ZR02": "ba7bf9ea18b54ca9bbdbfe54b381310f",
+    "ZR03": "174c31b6a00b4846ab63bcc3fed11d99",
+    "ZR04": "5efd7324209843d29efa926854a47a8e",
+    "ZR05": "55557e4c744643349892ffefc306bd41",
+    "ZR06": "42373c46326b49b9b4bcf8d234d8f86c",
+    "ZR07": "9ee3a17a89a143f292255be80e5f0026",
+    "ZR08": "dfeae585b56d43f293d5e133dbcf3ca6",
+    "ZR09": "29fe4453958340f9be2e4550b8b95943"
+};
+var BANK_CONTROL_ENUM = {
+    "10": "ffbb2e206a464c479fe8d2d8d902f89d",
+    "20": "da2869d2976e4d8eaa44da114bba9246"
+};
+var EMBEDDED_ALIAS_UK =   {
+    "bkont": "ac686e66497f47fdb3b0cdf1732740fc",
+    "bankNm": "eca8a128f185427497c59b45e7628be3",
+    "accountOwner": "22960031ab8148bfb2c7655e5b04cfe1",
+    "bankCountry": "ecbb42bd92d74b4498060de662a161ec",
+    "bankCode": "bf92cae6123041c0b024cdfbcb141afb",
+    "accountNo": "cb68072dc81847f89e4458f5b03d8f1f",
+    "isBillBank": "12113175519c4dffb5cbfcf05775417d"
+};
+
+var requestData = args.request.data;
+var preview = args.preview;
+var result;
+
+// 枚举需要特殊处理
+do {
+    // 唯一标识，不存在则返回
+    if (!requestData[SUPPLIER_TAG]) {
+        result = {'success': false, 'code': '40001','message': 'suppliers is null. modelUK ' + SUPPLIER_MODEL_UK};
+        break; 
+    }
+
+    var supplierExistQueryList = [];
+    var supplierRequestList = requestData[SUPPLIER_TAG];
+    var toSaveSupplierList = [];
+    for (let supplierIndex in supplierRequestList) {
+        let supplierRequest = supplierRequestList[supplierIndex];
+        supplierExistQueryList.push(supplierRequest['code']);
+        if (supplierRequest['supplierAccountGrp']) {
+            supplierRequest['supplierAccountGrp'] = SUPPLIER_TYPE_ENUM[supplierRequest['supplierAccountGrp']];
+        }
+        let toSaveBanks = [];
+        if (supplierRequest['banks']) {
+            let embeddedBankList = supplierRequest['banks'];
+            for (let embeddedIndex in embeddedBankList) {
+                let embeddedElement = embeddedBankList[embeddedIndex];
+                let toSaveElement = {};
+                for (let elementKey in embeddedElement) {
+                    if (elementKey === 'bkont') {
+                        let bkcontValue = embeddedElement['bkont'];
+                        toSaveElement[elementKey] = BANK_CONTROL_ENUM[bkcontValue];
+                    } else if (elementKey === 'isBillBank') {
+                        toSaveElement[elementKey] = new Boolean(1);
+                    } else {
+                        if (EMBEDDED_ALIAS_UK[elementKey]) {
+                            toSaveElement[elementKey] = embeddedElement[elementKey];
+                        }
+                    }
+                }
+                toSaveBanks.push(toSaveElement);
+            }
+        }
+        if (toSaveBanks.length > 0) {
+            supplierRequest['banks'] = {"items":toSaveBanks};
+        }
+        toSaveSupplierList.push(supplierRequest);
+    }
+
+    let supplierQuery = {'code': {'$in':supplierExistQueryList}};
+    let supplier = dataQuery.query(context,SUPPLIER_MODEL_UK,supplierQuery);
+    let supplierList = supplier.get(SYSTEM_CONTENT);
+    var existSupplierMap = {};
+    if (supplierList != null && supplierList.size() > 0) {
+        for(let existIndex in supplierList) {
+            let existSupplierItem = supplierList.get(existIndex);
+            existSupplierMap[existSupplierItem.get('code')] = existSupplierItem;
+        }
+    }
+    
+    // 拼接数据准备入库
+    dataRepository.begin(context);
+    for(let toSaveIndex in toSaveSupplierList) {
+        let toSaveSupplierItem = toSaveSupplierList[toSaveIndex];
+        if (existSupplierMap[toSaveSupplierItem['code']] == void 0) {
+            // todo init states
+            toSaveSupplierItem['_lifecycleInstance'] = {'status':'WAITING','states':[{'uniqueKey':'7af5ccc610cf11ed8d154a29d0e817e0','status':'WAITING','activities':[]}]};
+            dataRepository.save(context, SUPPLIER_MODEL_UK, toSaveSupplierItem);
+        }
+    }
+
+    var res = dataRepository.commit(context);
+    if (res) {
+        result = {'success': true, 'code': '200','data': requestData};
+    } else {
+        result = {'success': false, 'code': '40002','message': 'transaction commit execute error. modelUK ' + SUPPLIER_MODEL_UK};
+    }
+
+} while (false);
+
+// 结果输出
+result

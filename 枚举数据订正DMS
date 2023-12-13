@@ -1,0 +1,66 @@
+// 采购订单 - 待审批
+db.data_be9ce205b05b47ca893505fa65abf61c.find({'eb6f9477b8e24a45b18fc2089d078bf3':'9cccc9227f934c62adbce6a936b1ffa0'})
+db.data_be9ce205b05b47ca893505fa65abf61c.find({'eb6f9477b8e24a45b18fc2089d078bf3':'9cccc9227f934c62adbce6a936b1ffa0'},{_id:1})
+db.data_be9ce205b05b47ca893505fa65abf61c.updateMany( 
+  {_id : {$in: [ObjectId("63858e6f89d43f329cfc59c0"),ObjectId("639aa5cd70805a7f06327e30"),ObjectId("639aa5f609abd600a07cb4df"),ObjectId("639bd49470805a7f06328386"),ObjectId("639bdc7609abd600a07cb7e4"),ObjectId("639c0f7309abd600a07cb85f"),ObjectId("639c0f8370805a7f06328476"),ObjectId("639c2a4470805a7f063284b2"),ObjectId("639c2d1909abd600a07cb87e"),ObjectId("639c2dd570805a7f063284bb"),ObjectId("639c2dde70805a7f063284be")]}},
+  {$set:{'eb6f9477b8e24a45b18fc2089d078bf3':['1']}}
+)
+db.data_be9ce205b05b47ca893505fa65abf61c_sandbox.find({'eb6f9477b8e24a45b18fc2089d078bf3':'9cccc9227f934c62adbce6a936b1ffa0'},{_id:1})
+db.data_be9ce205b05b47ca893505fa65abf61c_sandbox.updateMany( 
+  {_id : {$in: [ObjectId("6376d335aab28b0312bf5167")]}},
+  {$set:{'eb6f9477b8e24a45b18fc2089d078bf3':['1']}}
+)
+
+// 采购订单 - 审批通过
+db.data_be9ce205b05b47ca893505fa65abf61c.find({'eb6f9477b8e24a45b18fc2089d078bf3':'07eacf509a3949e58e768f9c7be91140'}).sort({_id:-1})
+db.data_be9ce205b05b47ca893505fa65abf61c.find({'eb6f9477b8e24a45b18fc2089d078bf3':'07eacf509a3949e58e768f9c7be91140'},{_id:1}).sort({_id:-1})
+
+db.data_be9ce205b05b47ca893505fa65abf61c.updateMany( 
+  {_id : {$in: [ObjectId("637a1e23e00e9f5df49b0b8e"),ObjectId("637a1e20a0b1f85c7e9e855b"),ObjectId("637a1e1ce00e9f5df49b0b7d"),ObjectId("637a1e18a0b1f85c7e9e854c"),ObjectId("637a1e16e00e9f5df49b0b6c"),ObjectId("637a1e14a0b1f85c7e9e853f"),ObjectId("637a1c8ee00e9f5df49b0831"),ObjectId("637a1c8de00e9f5df49b082b")]}},
+  {$set:{'eb6f9477b8e24a45b18fc2089d078bf3':['2']}}
+)
+
+db.data_be9ce205b05b47ca893505fa65abf61c_sandbox.find({'eb6f9477b8e24a45b18fc2089d078bf3':'07eacf509a3949e58e768f9c7be91140'},{_id:1}).sort({_id:-1})
+
+db.data_be9ce205b05b47ca893505fa65abf61c_sandbox.updateMany( 
+  {_id : {$in: [ObjectId("63a312009dd53e291f34ce06"),ObjectId("63a30c409dd53e291f34cdfd"),ObjectId("63928b774e3e4c416e6969ab"),ObjectId("6386d7788d8d603d8eb004af"),ObjectId("63774804aab28b0312bf581f"),ObjectId("63773de0d5b30e353807e0f8"),ObjectId("63771605aab28b0312bf57ea"),ObjectId("63771549aab28b0312bf57e5")]}},
+  {$set:{'eb6f9477b8e24a45b18fc2089d078bf3':['2']}}
+)
+
+
+// 结算单- 扣除
+db.data_18ce46d2e0124e2185fd4ff6684786c8.find({'c249b0270cc2453ba94553ca7382e4e6':'0b84152c6554413dbfd9170ac50ed39e'},{_id:1}).sort({_id:-1})
+
+db.data_18ce46d2e0124e2185fd4ff6684786c8.updateMany( 
+  {_id : {$in: [ObjectId("63ab94d7717b3f00a1b1d407"),ObjectId("63a932f6717b3f00a1b1d2eb"),ObjectId("639bcc2f70805a7f06328316"),ObjectId("639a7f8909abd600a07cb4b7"),ObjectId("6392c3a24e3e4c416e696c01"),ObjectId("6392c3a24e3e4c416e696bff"),ObjectId("6392b329f9569179bc5ad800"),ObjectId("6392b329f9569179bc5ad7fe"),ObjectId("639133364e3e4c416e6966e5"),ObjectId("639024570afc650b6923dc5e"),ObjectId("639024570afc650b6923dc5b"),ObjectId("6390202b6673a73d81b3c03d"),ObjectId("6390202b6673a73d81b3c027"),ObjectId("63901cd66673a73d81b3c018"),ObjectId("638edde60bbfb96f2a0feaba"),ObjectId("638e89c90bbfb96f2a0fea4b"),ObjectId("638d976c0bbfb96f2a0fea34"),ObjectId("638d976c0bbfb96f2a0fea32"),ObjectId("6389a2e49266bf5c952e2d07"),ObjectId("638964f241543a448dc8b17b"),ObjectId("638964f241543a448dc8b14e"),ObjectId("63895adc41543a448dc8b147"),ObjectId("6389519a41543a448dc8b127"),ObjectId("638950f79266bf5c952e2cc9"),ObjectId("638867c141543a448dc8b0fb"),ObjectId("6388648d41543a448dc8b0d9"),ObjectId("63882a5b9266bf5c952e2c56"),ObjectId("6385bc6089d43f329cfc5a03"),ObjectId("6385bc6089d43f329cfc59fb"),ObjectId("6385bc6089d43f329cfc59f2"),ObjectId("6385bc5f89d43f329cfc59ee"),ObjectId("63859e5b6b1a305f3eedb587"),ObjectId("638591996b1a305f3eedb572"),ObjectId("638441ac6b1a305f3eedb4b0"),ObjectId("637f1bc17a56ef4669d8604c"),ObjectId("637c27a7846bf56e4e9a9625"),ObjectId("637c27a6846bf56e4e9a9616"),ObjectId("637a4174e00e9f5df49b1698"),ObjectId("637a410da0b1f85c7e9e9093"),ObjectId("637a40e2e00e9f5df49b1682"),ObjectId("637a406fe00e9f5df49b1671"),ObjectId("637a403ca0b1f85c7e9e9064"),ObjectId("637a3fc5e00e9f5df49b165f"),ObjectId("637a3e60a0b1f85c7e9e9004"),ObjectId("637a3b48e00e9f5df49b161f"),ObjectId("637a3ae1e00e9f5df49b1616"),ObjectId("637a3a99a0b1f85c7e9e8fa8"),ObjectId("637a38aca0b1f85c7e9e8f8d"),ObjectId("637a341ba0b1f85c7e9e8f56"),ObjectId("637a32c6a0b1f85c7e9e8f1e")]}},
+  {$set:{'c249b0270cc2453ba94553ca7382e4e6':['true']}}
+)
+
+db.data_18ce46d2e0124e2185fd4ff6684786c8.updateMany( 
+  {_id : {$in: [ObjectId("637a327be00e9f5df49b14ec"),ObjectId("637a327be00e9f5df49b14e9"),ObjectId("637a3246a0b1f85c7e9e8f0c"),ObjectId("6378a494e00e9f5df49b007b")]}},
+  {$set:{'c249b0270cc2453ba94553ca7382e4e6':['true']}}
+)
+
+db.data_18ce46d2e0124e2185fd4ff6684786c8.find({'c249b0270cc2453ba94553ca7382e4e6':'0b84152c6554413dbfd9170ac50ed39e'}).sort({_id:-1})
+
+db.data_18ce46d2e0124e2185fd4ff6684786c8_sandbox.find({'c249b0270cc2453ba94553ca7382e4e6':'0b84152c6554413dbfd9170ac50ed39e'},{_id:1}).sort({_id:-1})
+db.data_18ce46d2e0124e2185fd4ff6684786c8_sandbox.updateMany( 
+  {_id : {$in: [ObjectId("63a312009dd53e291f34ce06"),ObjectId("63a30c409dd53e291f34cdfd"),ObjectId("63928b774e3e4c416e6969ab"),ObjectId("6386d7788d8d603d8eb004af"),ObjectId("63774804aab28b0312bf581f"),ObjectId("63773de0d5b30e353807e0f8"),ObjectId("63771605aab28b0312bf57ea"),ObjectId("63771549aab28b0312bf57e5")]}},
+  {$set:{'c249b0270cc2453ba94553ca7382e4e6':['true']}}
+)
+
+// 结算单- 不扣除
+db.data_18ce46d2e0124e2185fd4ff6684786c8.find({'c249b0270cc2453ba94553ca7382e4e6':'b92f584e36f248ea933b624291b9591f'},{_id:1}).sort({_id:-1})
+db.data_18ce46d2e0124e2185fd4ff6684786c8.updateMany( 
+  {_id : {$in: [ObjectId("63acf7f79dd53e291f34d729"),ObjectId("63ac075e9dd53e291f34d6c7"),ObjectId("63aba8d99dd53e291f34d6b6"),ObjectId("63a8e9e99dd53e291f34d169"),ObjectId("63a8e7049dd53e291f34d163"),ObjectId("639a8a2b09abd600a07cb4d4"),ObjectId("63991f024e3e4c416e696f21"),ObjectId("6397ca9af9569179bc5ada86"),ObjectId("6396ec98f9569179bc5ada7e"),ObjectId("6392883af9569179bc5ad74a"),ObjectId("63916f00f9569179bc5ad699"),ObjectId("63913200f9569179bc5ad63f"),ObjectId("639026006673a73d81b3c072"),ObjectId("638ed38c4ff6b37bd273d93d"),ObjectId("638d56b09266bf5c952e2df6"),ObjectId("638d4d469266bf5c952e2dbf"),ObjectId("638d4d459266bf5c952e2d4f"),ObjectId("638d4d459266bf5c952e2d46"),ObjectId("6389655141543a448dc8b187"),ObjectId("63895d4f9266bf5c952e2cd5"),ObjectId("6388100741543a448dc8adc0"),ObjectId("6385c86b6b1a305f3eedb5cd"),ObjectId("6385bda26b1a305f3eedb5a5"),ObjectId("63859ef289d43f329cfc59cf"),ObjectId("638591486b1a305f3eedb56a"),ObjectId("638416f76b1a305f3eedb498"),ObjectId("637ee0c974409f4bf9280370"),ObjectId("637edeb774409f4bf928034f"),ObjectId("637a41c7a0b1f85c7e9e90ab"),ObjectId("637a40b6a0b1f85c7e9e9082"),ObjectId("637a3f95a0b1f85c7e9e9044"),ObjectId("637a3c6ce00e9f5df49b162a"),ObjectId("637a3b11a0b1f85c7e9e8fb7"),ObjectId("637a341aa0b1f85c7e9e8f54"),ObjectId("637a32f8e00e9f5df49b152c"),ObjectId("637a32f8e00e9f5df49b1526"),ObjectId("637a32f8e00e9f5df49b1522"),ObjectId("637a32f7e00e9f5df49b151d"),ObjectId("637a32f7e00e9f5df49b1518"),ObjectId("637a32f6e00e9f5df49b150d"),ObjectId("637a32c6a0b1f85c7e9e8f28"),ObjectId("637a32c6a0b1f85c7e9e8f20"),ObjectId("637a327ce00e9f5df49b14f7"),ObjectId("637a327ce00e9f5df49b14f1"),ObjectId("637a3246a0b1f85c7e9e8f0a"),ObjectId("637a3225e00e9f5df49b14e3"),ObjectId("637a1bb6a0b1f85c7e9e850d")]}},
+  {$set:{'c249b0270cc2453ba94553ca7382e4e6':['false']}}
+)
+
+
+db.data_18ce46d2e0124e2185fd4ff6684786c8.find({'c249b0270cc2453ba94553ca7382e4e6':'b92f584e36f248ea933b624291b9591f'}).sort({_id:-1})
+db.data_18ce46d2e0124e2185fd4ff6684786c8_sandbox.find({'c249b0270cc2453ba94553ca7382e4e6':'b92f584e36f248ea933b624291b9591f'},{_id:1}).sort({_id:-1})
+
+db.data_18ce46d2e0124e2185fd4ff6684786c8_sandbox.updateMany( 
+  {_id : {$in: [ObjectId("6399e7af70805a7f06327deb"),ObjectId("6386d8456ef1f64962eba0b6"),ObjectId("6386d8456ef1f64962eba0b2"),ObjectId("63772ee9d5b30e353807e0d6"),ObjectId("63772e96d5b30e353807e0ce"),ObjectId("63772e95aab28b0312bf5801")]}},
+  {$set:{'c249b0270cc2453ba94553ca7382e4e6':['false']}}
+)

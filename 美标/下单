@@ -1,0 +1,158 @@
+// 下单模型
+var order_model_uk = "b205c30f84ec402eaa5be2b6e327cdc1";
+// 下单中明细属性
+var order_detail_uk = "3bb27f687ed649dca64cc3bd202298d8";
+// 下单中商品货号
+var order_productId_uk = "69223e4c135b45a7a3ee8eb03c58b30c";
+var order_account_uk = "51aab916ecc74081a66d854b8bf5f34d";
+
+// 下单明细
+var orderDetail_model_uk = "ac318988c5c1400da453dec1dc193a03";
+var orderDetail_productId_uk = "45575158a0964fbfac3ed2ad69e10964";
+var orderDetail_order_num_uk = "cc4a22fae28c4a26abc125e135971b9a";
+var orderDetail_aggregate_uk = "7bdb4a5a133c4cba9d98015dcc89fa51";
+var orderDetail_lastOrderRef_uk = "547d6a6c39e24acca3687337bed836c1";
+var orderDetail_account_uk = "b379b9d1ebdc4f49a1595604a54c8173";
+var orderDetail_productAggregate_uk = "2b4b6548124b4daa80d7c1d50c8a1898";
+var orderDetail_dealerAggregate_uk = "9d4231339ab7417492ecdc0f2ce274bd";
+var SYSTEM_ITMES = "items";
+var SYSTEM_ID = "_id";
+var SYSTEM_MODEL = "_modelUniqueKey";
+var SYSTEM_ITEMS = "items";
+var SYSTEM_CONTENT = "content";
+
+// 商品模型
+var product_model_uk = "31413ab86eb6483a9ec006a7c247b45e";
+var product_detail_uk = "61b8d4b7166d46be8c79ec650e23b527";
+
+
+// 经销商模型
+var dealer_model_uk = "6e18bd9e3cc94d33a991a0923adbc0a8";
+var dealer_detail_uk = "7738cdc602034f69b667bf42900007f4";
+
+
+var orderData = args.request.data;
+
+var result;
+do {
+    if (orderData == null) {
+        console.log("objectData is null.");
+        result = {'success': false, 'code': '40001','message': "下单数据为空."};
+        break;
+    }
+    
+    if (orderData.get(order_detail_uk) == null 
+    || orderData.get(order_detail_uk).get(SYSTEM_ITMES) == null) {
+        console.log("order detail is null.");
+        result = {'success': false, 'code': '40001','message': "下单明细数量为空."};
+        break;
+    }
+    var itemList = orderData.get(order_detail_uk).get(SYSTEM_ITMES);
+    // 区分创建、修改
+    var toCreateList = [];
+    var toUpdateList = [];
+    for (let index in itemList) {
+        item = itemList[index];
+        console.log("order num is " + JSON.stringify(item.get(orderDetail_order_num_uk)));
+        //判断下单数量
+        if (item.get(orderDetail_order_num_uk) === null 
+        || item.get(orderDetail_order_num_uk) === undefined 
+        || item.get(orderDetail_order_num_uk) === "") {
+            continue;
+        }
+        if (item.get(orderDetail_lastOrderRef_uk) != null 
+        && item.get(orderDetail_lastOrderRef_uk).length > 0){
+            toUpdateList.push(item);
+        } else {
+            toCreateList.push(item);
+        }
+    }
+    console.log("create list length is " + toCreateList.length);
+    console.log("update list length is " + toUpdateList.length);
+    if (toCreateList.length === 0 && toUpdateList.length === 0) {
+        console.log("order detail is empty.");
+        result = {'success': false, 'code': '40001','message': "下单数量全部为空."};
+        break;
+    }
+
+    var productId = itemList.get(0).get(orderDetail_productId_uk);
+
+    // 可能订单已存在,需要通过查询明细来确认
+    var orderId;
+    var orderQueryMap = {};
+    orderQueryMap[order_productId_uk] = { '$eq': productId };
+    orderQueryMap[order_account_uk] = {'$eq':orderData.get(order_account_uk).get(0).get("id")};
+    var orderQueryData = dataQuery.query(context, order_model_uk, orderQueryMap);
+    var orderItems = orderQueryData.get(SYSTEM_CONTENT);
+    if (orderItems != null && orderItems.length > 0) {
+        orderId = orderItems.get(0).get(SYSTEM_ID);
+        console.log("orderId is " + orderId);
+    }
+
+    // dataRepository.begin(context);
+    // 全部是创建
+    if (orderId == null) {
+        var orderItemMap = {};
+        orderItemMap[order_productId_uk] = productId;
+        orderItemMap[order_account_uk] = orderData[order_account_uk];
+        // 订单生命周期
+        orderItemMap['_lifecycleInstance'] = {'status':'WAITING','states':[{'uniqueKey':'st0xnH7B7j0V66QG','status':'WAITING','activities':[]}]};
+        var createOrderId = dataRepository.save(context, order_model_uk, orderItemMap);
+
+        for (let createIndex in toCreateList) {
+            let detailCreateItem = toCreateList[createIndex];
+            detailCreateItem[orderDetail_aggregate_uk] = createOrderId;
+            // 明细创建生命周期
+            detailCreateItem['_lifecycleInstance'] = {'status':'WAITING','states':[{'uniqueKey':'st0xTgwTE52U8Dft','status':'WAITING','activities':[]}]};
+            var detailItemId = dataRepository.save(context, orderDetail_model_uk, detailCreateItem);
+            // 订单中增加明细
+            dataRepository.recordOneToMany(context, order_model_uk, createOrderId, order_detail_uk, "items",detailItemId);
+
+            // 商品中增加明细
+            let productId = detailCreateItem.get(orderDetail_productAggregate_uk).get(SYSTEM_ID);
+            dataRepository.recordOneToMany(context, product_model_uk, productId, product_detail_uk, "items",detailItemId);
+
+            // 经销商中增加明细
+            let dealerId = detailCreateItem.get(orderDetail_dealerAggregate_uk).get(SYSTEM_ID);
+            dataRepository.recordOneToMany(context, dealer_model_uk, dealerId, dealer_detail_uk, "items",detailItemId);
+        }
+
+    } else {
+        // 更新明细
+        if (toUpdateList.length > 0) {
+            for (let updateIndex in toUpdateList) {
+                var updateItem = toUpdateList[updateIndex];
+                updateItem['_version'] = updateItem.get(orderDetail_lastOrderRef_uk).get('_version');
+                var updateId = updateItem.get(orderDetail_lastOrderRef_uk).get(0).get(SYSTEM_ID);
+                dataRepository.update(context, orderDetail_model_uk, updateId, updateItem);
+            }
+        }
+
+        // 创建明细
+        if (toCreateList.length > 0) {
+            for (let toCreateIndex in toCreateList) {
+                let detailCreateItem = toCreateList[toCreateIndex];
+                // 真实id
+                detailCreateItem[orderDetail_aggregate_uk] = {"_id" : orderId, "_modelUniqueKey": order_model_uk};
+                // 明细创建生命周期
+                detailCreateItem['_lifecycleInstance'] = {'status':'WAITING','states':[{'uniqueKey':'st0xTgwTE52U8Dft','status':'WAITING','activities':[]}]};
+                var detailItemId = dataRepository.save(context, orderDetail_model_uk, detailCreateItem);
+                // 订单中增加明细
+                dataRepository.recordOneToMany(context, order_model_uk, orderId, order_detail_uk, "items",detailItemId);
+
+                // 商品中增加明细
+                let productId = detailCreateItem.get(orderDetail_productAggregate_uk).get(SYSTEM_ID);
+                dataRepository.recordOneToMany(context, product_model_uk, productId, product_detail_uk, "items",detailItemId);
+
+                // 经销商中增加明细
+                let dealerId = detailCreateItem.get(orderDetail_dealerAggregate_uk).get(SYSTEM_ID);
+                dataRepository.recordOneToMany(context, dealer_model_uk, dealerId, dealer_detail_uk, "items",detailItemId);
+            }
+        }
+    }
+
+    // dataRepository.commit(context);
+    result = {'success': true, 'code': '200'}; 
+} while (false);
+
+result

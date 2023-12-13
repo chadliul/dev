@@ -1,0 +1,184 @@
+// {
+//     "kptz":{
+//         "attributeIndex":["36f36453701d432abd57a4cd7d9b76aa"]
+//     },
+//     "zdzjzrq":{
+//         "attributeIndex":["1f45230cc0a74a7098b31310cda62e66","$get(\"start\")"],
+//         "dataType": "textual"
+//     },
+//     "supplier_code":{
+//         "attributeIndex":[
+//             "a9446e86b7714babbc4a510fcfa0b8d5",
+//             "$first",
+//             "7f606e1c873e46af9acf0f90923acc50"]
+//     },
+//     "supplier_name":{
+//         "attributeIndex":[
+//             "a9446e86b7714babbc4a510fcfa0b8d5",
+//             "$first",
+//             "6b9ba6905aad4acf823d33507ea53506"]
+//     },
+//     "dmbtr01_sum":{
+//         "attributeIndex":["2b86c5bfe72c40dfbb48dd8dc4190347"]
+//     },
+//     "dmbtr06_sum":{
+//         "attributeIndex":["aa58c700895e476fb75b2d4b3359c270"]
+//     },
+//     "zquality":{
+//         "attributeIndex":["fb3f99324d0d46178500e2cbd83b8f75"]
+//     },
+//     "zproduction":{
+//         "attributeIndex":["56858062b9e94636840217d4b29d9ee0"]
+//     },
+//     "zlogistics":{
+//         "attributeIndex":["ab54db41af4d485589ce5d54ef41af44"]
+//     },
+//     "zdeduction":{
+//         "attributeIndex":["082e94d1a7694b859d2fb836e4b7040a"]
+//     },
+//     "sum_sub_menge":{
+//         "attributeIndex":[
+//             "798f660943a34ebbbe59f218197b90d0",
+//             "$sum",
+//             "247e4797f3ca422ea0b70d2ada138a56"]
+//     },
+//     "sum_sub_dmbtr02":{
+//         "attributeIndex":[
+//             "798f660943a34ebbbe59f218197b90d0",
+//             "$sum",
+//             "98c22c96b5494f89acf9b6046e59d327"]
+//     },
+//     "sum_sub_dmbtr01":{
+//         "attributeIndex":[
+//             "798f660943a34ebbbe59f218197b90d0",
+//             "$sum",
+//             "acfa60ef371f41009000968a75e82adf"]
+//     }
+// }
+
+{
+    "kptz":{
+        "attributeIndex":["36f36453701d432abd57a4cd7d9b76aa"]
+    },
+    "zdzjzrq":{
+        "attributeIndex":["1f45230cc0a74a7098b31310cda62e66","$get(\"start\")"],
+        "dataType": "textual"
+    },
+    "supplier_code":{
+        "attributeIndex":[
+            "a9446e86b7714babbc4a510fcfa0b8d5",
+            "$first",
+            "7f606e1c873e46af9acf0f90923acc50"]
+    },
+    "supplier_name":{
+        "attributeIndex":[
+            "a9446e86b7714babbc4a510fcfa0b8d5",
+            "$first",
+            "6b9ba6905aad4acf823d33507ea53506"]
+    },
+    "dmbtr01_sum":{
+        "attributeIndex":["2b86c5bfe72c40dfbb48dd8dc4190347"]
+    },
+    "dmbtr06_sum":{
+        "attributeIndex":["aa58c700895e476fb75b2d4b3359c270"]
+    },
+    "zquality":{
+        "attributeIndex":["fb3f99324d0d46178500e2cbd83b8f75"]
+    },
+    "zproduction":{
+        "attributeIndex":["56858062b9e94636840217d4b29d9ee0"]
+    },
+    "zlogistics":{
+        "attributeIndex":["ab54db41af4d485589ce5d54ef41af44"]
+    },
+    "zother":{
+        "attributeIndex":["47c7f9039a574eb384737a801cd86649"]
+    },
+    "cal_totalduction":{
+        "attributeIndex":["b04ae4cddd3b462d894dccb6ce6e6808"]
+    },
+    "cal_shouldpayamount":{
+        "attributeIndex":["5102f769e337461c9584ee5f50ba79d9"]
+    },
+    "sum_sub_menge":{
+        "attributeIndex":[
+            "798f660943a34ebbbe59f218197b90d0",
+            "$sum",
+            "247e4797f3ca422ea0b70d2ada138a56"]
+    },
+    "sum_sub_dmbtr02":{
+        "attributeIndex":[
+            "798f660943a34ebbbe59f218197b90d0",
+            "$sum",
+            "98c22c96b5494f89acf9b6046e59d327"]
+    },
+    "sum_sub_dmbtr01":{
+        "attributeIndex":[
+            "798f660943a34ebbbe59f218197b90d0",
+            "$sum",
+            "acfa60ef371f41009000968a75e82adf"]
+    }
+}
+
+$cal_totalduction
+=$dmbtr06_sum+$zquality+$zproduction+$zlogistics+$zother
+
+质保金扣除金额-汇总 质量问题索赔扣款  生产问题索赔 物流问题索赔 其它扣款
+{
+    "formula":"dmbtr06_sum + zquality + zproduction + zlogistics + zother",
+    "variableBindings":{
+        "dmbtr06_sum":{
+            "attributeIndex":["aa58c700895e476fb75b2d4b3359c270"],
+            "defaultValue":0
+        },
+         "zquality":{
+            "attributeIndex":["fb3f99324d0d46178500e2cbd83b8f75"],
+            "defaultValue":0
+        },
+        "zproduction":{
+            "attributeIndex":["56858062b9e94636840217d4b29d9ee0"],
+            "defaultValue":0
+        },
+        "zlogistics":{
+            "attributeIndex":["ab54db41af4d485589ce5d54ef41af44"],
+            "defaultValue":0
+        },
+        "zother":{
+            "attributeIndex":["47c7f9039a574eb384737a801cd86649"],
+            "defaultValue":0
+        }
+    }
+}
+
+$cal_shouldpayamount
+=$dmbtr01_sum-($dmbtr06_sum+$zquality+$zproduction+$zlogistics+$zother)
+
+{
+    "formula":"dmbtr01_sum - dmbtr06_sum - zquality - zproduction - zlogistics - zother",
+    "variableBindings":{
+        "dmbtr01_sum":{
+            "attributeIndex":["2b86c5bfe72c40dfbb48dd8dc4190347"],
+            "defaultValue":0
+        },
+        "dmbtr06_sum":{
+            "attributeIndex":["aa58c700895e476fb75b2d4b3359c270"],
+            "defaultValue":0
+        },
+         "zquality":{
+            "attributeIndex":["fb3f99324d0d46178500e2cbd83b8f75"],
+            "defaultValue":0
+        },
+        "zproduction":{
+            "attributeIndex":["56858062b9e94636840217d4b29d9ee0"],
+            "defaultValue":0
+        },
+        "zlogistics":{
+            "attributeIndex":["ab54db41af4d485589ce5d54ef41af44"],
+            "defaultValue":0
+        },
+        "zother":{
+            "attributeIndex":["47c7f9039a574eb384737a801cd86649"],
+            "defaultValue":0
+        }
+    }
+}

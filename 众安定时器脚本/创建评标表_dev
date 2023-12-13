@@ -1,0 +1,139 @@
+// 状态机脚本，创建评标表
+var EVALUATION_MODEL_UK = "bce36b5365654c6d9c7c7ef00907325c";
+var QUOTE_MODEL_UK = "5857cfaa20d943be924e9993cf0f428f";
+var INQUIRY_MODEL_UK = "2d52232add564d25b4bff059f79cdec2";
+var SYSTEM_ID = "_id";
+var SYSTEM_MODEL = "_modelUniqueKey";
+var SYSTEM_ITEMS = "items";
+var SYSTEM_CONTENT = "content";
+
+var inquiryQuoteSpeUk = "bddb53c4cbf44402804790535016713d";
+var inquiryEvaluatorSpeUk = "6f975db3dddb456b839c165e9641e040";
+var inquiryEvaluatorEmbUk = "95541a63ff594aef81d042c666173eee";
+// 需要调整
+var inquiryEvalateAccountUk = "baf240bbe9ca473f9e26c24d68428bf8";
+
+var quoteSupplierUk = "5ed982fa7a1647449978e8bd2219937f";
+var quoteQuestionEmbeddedUk = "b2c48a4d04e84833be55f914558ae4a6";
+var quoteQuestionUk = "c8dfdc5fff3941688332b63f85d91265";
+var quotequestionAnswerUk = "1f692f894c364fe1a8b0164409750624";
+var quoteQuestionAttachmentUk = "41f2c36e4ede4103ba1a57bb1fcc1e2d";
+var quoteQuestionBoolUk = "55d59782d8ad4eeb94e68a3c50909ddd";
+var quoteEvaluatorSpeUk = "3a68474a38a640948af956b65778d54d";
+
+// 评标人信息
+var evaluateAccountUk = "59a71eb29b714dccb822000c87952a1d";
+var evaluatorQuoteUk = "353623b6e120471185cad24c7e5e4004";
+var evaluatorSupplierUk = "d2a18773579e43cc99941db647de0796";
+var evaluatorInquiryUk = "8eeaaae595644c118df7225572fac8ff";
+var evaluatorQuestionEmbUk = "8f70bcec0db94f4d9ecca27548c73b96";
+var evaluatorQuestionUk = "3aa2b12d62724feca13cdcf6c5f6f457";
+var evaluatorQuestionAnswerUk = "7bea6cd14c1d4acf80e7cfd09b06cf9d";
+var evaluatorQuestionAttachmentUk = "21d1f53211814dabb01178cff5e26b5b";
+var evaluatorQuestionBoolUk = "95fa9d1149f946adb3702f32758d54a0";
+
+var objectDataList = args.objectData;
+var result;
+do {
+    if (!objectDataList.get(0)) {
+        console.log("request objectData is empty.");
+        result = {'success': false, 'code': '409', 'message': 'supplier_embedded is empty.'};
+        break;
+    }
+    var objectData = objectDataList.get(0);
+    // dataid查询主表
+    var receiveQueryRes = dataQuery.findById(context, INQUIRY_MODEL_UK, objectData[SYSTEM_ID]);
+    var inquiryData = receiveQueryRes.get(SYSTEM_CONTENT);
+    if (inquiryData == null || inquiryData.size() == 0) {
+        result = {'success': true, 'code': '40001','message': 'inquiry data is null. modelUK ' + INQUIRY_MODEL_UK};
+        break; 
+    }
+    // 确认报价明细
+    if (!inquiryData.get(inquiryQuoteSpeUk)) {
+        console.log("current inquiry detail is empty.");
+        result = {'success': true, 'code': '409', 'message': 'supplier_embedded is empty.'};
+        break;
+    }
+    var quoteDetail = inquiryData.get(inquiryQuoteSpeUk);
+    if (!quoteDetail.get(SYSTEM_ITEMS)) {
+        console.log("inquiry detail items is empty.");
+        result = {'success': true, 'code': '409', 'message': 'supplier_embedded is empty.'};
+        break;
+    }
+    // 确认评标人
+    if (!inquiryData.get(inquiryEvaluatorEmbUk)) {
+        console.log("current inquiry evaluator is empty.");
+        result = {'success': true, 'code': '409', 'message': 'supplier_embedded is empty.'};
+        break;
+    }
+    var inquiryEvaluatorEmb = inquiryData.get(inquiryEvaluatorEmbUk);
+    if (!inquiryEvaluatorEmb.get(SYSTEM_ITEMS)) {
+        console.log("current inquiry evaluator is empty.");
+        result = {'success': true, 'code': '409', 'message': 'supplier_embedded is empty.'};
+        break;
+    }
+
+    // 查询报价
+    var quoteItemIdList = [];
+    var quoteItemList = quoteDetail.get(SYSTEM_ITEMS);
+    for (let index in quoteItemList) {
+        let quoteItem = quoteItemList[index];
+        quoteItemIdList.push(quoteItem.get(SYSTEM_ID));
+    }
+    var quoteDetailRes = dataQuery.findByIds(context, QUOTE_MODEL_UK, quoteItemIdList);
+    var quoteDetailList = quoteDetailRes.get(SYSTEM_CONTENT);
+    if (quoteDetailList == null || quoteDetailList.size == 0) {
+        console.log("quote query errory.");
+        result = {'success': false, 'code': '409', 'message': 'supplier_embedded is empty.'};
+        break;
+    }
+
+    // 遍历评标人
+    dataRepository.begin(context);
+    var inquiryEvaluatorList = inquiryEvaluatorEmb.get(SYSTEM_ITEMS);
+    for (let evaluatorIndex in inquiryEvaluatorList) {
+        let inquiryEvaluatorItem = inquiryEvaluatorList[evaluatorIndex];
+        for (let quoteIndex in quoteDetailList) {
+            let quoteDetailItem = quoteDetailList[quoteIndex];
+            
+            let evaluatorItem = {};
+            // 填充评标信息
+            evaluatorItem[evaluateAccountUk] = inquiryEvaluatorItem.get(inquiryEvalateAccountUk);
+            evaluatorItem[evaluatorQuoteUk] = {"_id":quoteDetailItem.get(SYSTEM_ID)};
+            evaluatorItem[evaluatorSupplierUk] = quoteDetailItem.get(quoteSupplierUk);
+            evaluatorItem[evaluatorInquiryUk] = {"_id":inquiryData.get(SYSTEM_ID)};
+            let evaluatorQuestionList = [];
+            if (quoteDetailItem.get(quoteQuestionEmbeddedUk)) {
+                let quoteQuestionEmbedded = quoteDetailItem.get(quoteQuestionEmbeddedUk);
+                if (quoteQuestionEmbedded.get(SYSTEM_ITEMS)) {
+                    let quoteQuestionList = quoteQuestionEmbedded.get(SYSTEM_ITEMS);
+                    for (let questionIndex in quoteQuestionList) {
+                        let questionItem = quoteQuestionList[questionIndex];
+                        let evaluatorQuestion = {};
+                        evaluatorQuestion[evaluatorQuestionUk] = questionItem.get(quoteQuestionUk);
+                        evaluatorQuestion[evaluatorQuestionAnswerUk] = questionItem.get(quotequestionAnswerUk);
+                        evaluatorQuestion[evaluatorQuestionAttachmentUk] = questionItem.get(quoteQuestionAttachmentUk);
+                        evaluatorQuestion[evaluatorQuestionBoolUk] = questionItem.get(quoteQuestionBoolUk);
+                        evaluatorQuestionList.push(evaluatorQuestion);
+                    }
+                }
+            }
+            if (evaluatorQuestionList.length > 0 ) {
+                evaluatorItem[evaluatorQuestionEmbUk] = {"items":evaluatorQuestionList};
+            }
+            var evaluatorItemId = dataRepository.save(context, EVALUATION_MODEL_UK, evaluatorItem);
+
+            // 报价更新
+            dataRepository.recordOneToMany(context, QUOTE_MODEL_UK, quoteDetailItem.get(SYSTEM_ID), quoteEvaluatorSpeUk, SYSTEM_ITEMS, evaluatorItemId);
+
+            // 询价更新
+            dataRepository.recordOneToMany(context, INQUIRY_MODEL_UK, inquiryData.get(SYSTEM_ID), inquiryEvaluatorSpeUk, SYSTEM_ITEMS, evaluatorItemId);
+        }
+        
+    }
+
+    dataRepository.commit(context);
+    result = {'success': true, 'data': requestData, 'code': '200'}; 
+} while (false);
+
+result

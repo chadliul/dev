@@ -1,0 +1,136 @@
+//原始数据
+//datadto=
+{
+    "ffb1638979c54de3925027e1fd0ba247": {
+      "items": [
+        {
+          "53b1638979c54de392502311fd0ba247": 11,
+          "23b1618979c542e392502311fd0ba247": 12
+        },
+        {
+          "53b1638979c54de392502311fd0ba247": 21,
+          "23b1618979c542e392502311fd0ba247": 22
+        },
+        {
+          "53b1638979c54de392502311fd0ba247": 31,
+          "23b1618979c542e392502311fd0ba247": 32
+        }
+      ]
+    }
+  }
+  //binding
+  "varc10cf11e": {
+    "attributeIndex": [
+      "ffb1638979c54de3925027e1fd0ba247" //明细表AttributeUnique
+    ],
+    "variableBindings": {
+      "var234wwq": {
+        "attributeIndex": [
+          "53b1638979c54de392502311fd0ba247"
+        ]
+      },
+      "var3we24": {
+        "attributeIndex": [
+          "23b1618979c542e392502311fd0ba247"
+        ]
+      }
+    }
+  }
+  //得到
+  {
+    "varc10cf11e": [
+      {
+        "var234wwq": 11,
+        "var3we24": 12
+      },
+      {
+        "var234wwq": 21,
+        "var3we24": 22
+      },
+      {
+        "var234wwq": 31,
+        "var3we24": 32
+      }
+    ]
+  }
+  
+引用：
+"$sub_table_first_san_name": {
+    "attributeIndex": [
+      "69f0fd7081b5436b97748ab9efbc34b9",
+      "$first",
+      "49a44962f1934482a2ee147e775c3b10"
+    ]
+  }
+
+
+{
+    "$name":{
+        "attributeIndex":["3041644c19e84ad3ae16dc04f84edc5b"]
+    },
+    "$sys_sub_san_info":{
+        "attributeIndex":["69f0fd7081b5436b97748ab9efbc34b9"],
+        "variableBindings":{
+            "$san_name":{
+                "attributeIndex":["49a44962f1934482a2ee147e775c3b10"]
+            },
+            "$san_boys":{
+                "attributeIndex":["6653743c6f6d4c1c9b50082d38c28399"]
+            }
+        }
+    }
+}
+
+
+{
+    "@delivery_no":{
+        "attributeIndex":["dde701e5b5fa42bc9615ef7fe06b85f4"]
+    },
+    "@supplier_code":{
+        "attributeIndex":[
+            "3c12b1bbb2af4791899ce95c308ec43d",
+            "$first",
+            "8639939268c44e6694bd9c0954ad229c"]
+    },
+    "@supplier_name":{
+        "attributeIndex":[
+            "3c12b1bbb2af4791899ce95c308ec43d",
+            "$first",
+            "5afcd7d6b8214b7a867ff9575ee8ec5d"]
+    },
+    "@delivery_date":{
+        "attributeIndex":["6df414ecaf5042208e9043012811c551"]
+    },
+    "@cusPhone":{
+        "attributeIndex":["7cf7e6143a2948a99c09ba38ef782bd3"]
+    },
+    "@cusAddress":{
+        "attributeIndex":["5326f544358c40e492a60528eb046a4e"]
+    },
+    "@sys_sub_info":{
+        "attributeIndex":["1f126958ae16487c968113a21904ffc4"],
+        "variableBindings":{
+            "@order_no":{
+                "attributeIndex":["6e8f522aeffb418d850c3aa31913de33"]
+            },
+            "@planDeliveryDate":{
+                "attributeIndex":["f341553b26c54c1d871bd9809e7f89cd"]
+            },
+            "@matCode":{
+                "attributeIndex":["4ebd08b00468458a8f261eef36643a0d"]
+            },
+            "@matName":{
+                "attributeIndex":["6c0d6ef6588c428e875ce8954b7a365e"]
+            },
+            "@unit":{
+                "attributeIndex":["ea61bf6d1c974104b5b1cd9b1e340671"]
+            },
+            "@orderNum":{
+                "attributeIndex":["d5f50e7361a04bef9c7c171d47f04f21"]
+            },
+            "@deliveryNum":{
+                "attributeIndex":["d3e2c3c893cb4b27aa73e0cc9cb7dfbb"]
+            }
+        }
+    }
+}

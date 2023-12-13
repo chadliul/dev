@@ -1,0 +1,112 @@
+// 状态机脚本，创建报价
+var QUOTE_MODEL_UK = "5857cfaa20d943be924e9993cf0f428f";
+var INQUIRY_MODEL_UK = "2d52232add564d25b4bff059f79cdec2";
+var SYSTEM_ID = "_id";
+var SYSTEM_MODEL = "_modelUniqueKey";
+var SYSTEM_ITEMS = "items";
+var SYSTEM_CONTENT = "content";
+var inquirySupplierEmbeddedUk = "772abc6d659c4c4fb8dddb76c83fea1b";
+var inquirySupplierUk = "7d9a9899e0ea4c5a877adbcf0339419e";
+var inquirySupplierAccountUk = "90bab8810cb64fd98bb08d990dacd8cd";
+var inquiryProjectUk = "5efc7c2550a349a4bf19250bad54abd2";
+var inquiryTitleUk = "50f8338109954268b33faf425a12f1ad";
+var inquiryQuoteUk = "bddb53c4cbf44402804790535016713d";
+var inquiryQuestionEmbeddedUk = "f5eae9a284a44af3a8514aa13d557252";
+var inquiryQuestionUk = "7e5b999fcb7449ac8f300326e55ed911";
+var inquiryPurchaseDetailUk = "f523f057ebfa4c799fcea7942a5f8ec2";
+var inquiryPurchaseProductUk = "d253ccec600946cf8ff8765a5a3e288e";
+var inquiryPurchaseProductCountUk = "f28d22014f8441e7bb4786b56b3eb230";
+
+var quoteInquiryUk = "cd80744f6d9c46a1ba0244760d7459ca";
+var quoteSupplierUk = "5ed982fa7a1647449978e8bd2219937f";
+var quoteSupplierAccountUk = "ca3c96d1dc78416788e774ba2256bec8";
+var quoteProjectUk = "7fb295bd277e4d688f4706aa1c7d0c6c";
+var quoteInquiryTitleUk = "ae7a3c4bb4d9463bbbae3a5c316f4a4b";
+var quoteQuestionEmbeddedUk = "b2c48a4d04e84833be55f914558ae4a6";
+var quoteQuestionUk = "c8dfdc5fff3941688332b63f85d91265";
+var quoteDetailUk = "5ea87c51a9f149a894e53ce6e31b1012";
+var quoteDetailProductUk = "1e41877a4d7c49919ddd3c98896bc112";
+var quoteDetailProductCountUk = "d5f16597469a42b4bdecd4caad8cb7a7";
+
+var objectDataList = args.objectData;
+var result;
+do {
+    if (!objectDataList.get(0)) {
+        console.log("request objectData is empty.");
+        result = {'success': false, 'code': '409', 'message': 'supplier_embedded is empty.'};
+        break;
+    }
+    var objectData = objectDataList.get(0);
+    // dataid查询主表
+    var receiveQueryRes = dataQuery.findById(context, INQUIRY_MODEL_UK, objectData[SYSTEM_ID]);
+    var requestData = receiveQueryRes.get(SYSTEM_CONTENT);
+    if (requestData == null || requestData.size() == 0) {
+        result = {'success': true, 'code': '40001','message': 'inquiry data is null. modelUK ' + INQUIRY_MODEL_UK};
+        break; 
+    }
+    if (!requestData.get(inquirySupplierEmbeddedUk)) {
+        console.log("supplier_embedded is empty.");
+        result = {'success': true, 'code': '409', 'message': 'supplier_embedded is empty.'};
+        break;
+    }
+    var supplier_embedded = requestData.get(inquirySupplierEmbeddedUk);
+    if (!supplier_embedded.get(SYSTEM_ITEMS)) {
+        console.log("supplier_embedded items is empty.");
+        result = {'success': true, 'code': '409', 'message': 'supplier_embedded is empty.'};
+        break;
+    }
+
+    dataRepository.begin(context);
+    let supplierItemsList = supplier_embedded.get(SYSTEM_ITEMS);
+    for(let index in supplierItemsList) {
+        let quoteItem = {};
+        quoteItem[quoteSupplierUk] = supplierItemsList[index].get(inquirySupplierUk);
+        quoteItem[quoteSupplierAccountUk] = supplierItemsList[index].get(inquirySupplierAccountUk);
+        quoteItem[quoteInquiryUk] = {"_id":requestData.get("_id")};
+        quoteItem[quoteProjectUk] = requestData.get(inquiryProjectUk);
+        quoteItem[quoteInquiryTitleUk] = requestData.get(inquiryTitleUk);
+        // 问题
+        let question = [];
+        if (requestData.get(inquiryQuestionEmbeddedUk)) {
+            let inquiryQuestion = requestData.get(inquiryQuestionEmbeddedUk);
+            if (inquiryQuestion.get(SYSTEM_ITEMS)) {
+                let questionList = inquiryQuestion.get(SYSTEM_ITEMS);
+                for (let questionIdex in questionList) {
+                    let inquiryQuestionItem = questionList[questionIdex];
+                    let quoteQuestionItem = {};
+                    quoteQuestionItem[quoteQuestionUk] = inquiryQuestionItem[inquiryQuestionUk];
+                    question.push(quoteQuestionItem);
+                }
+            }
+        }
+        quoteItem[quoteQuestionEmbeddedUk] = {"items":question};
+
+        // 报价明细
+        let detail = [];
+        if (requestData.get(inquiryPurchaseDetailUk)) {
+            let purchaseDetail = requestData.get(inquiryPurchaseDetailUk);
+            if (purchaseDetail.get(SYSTEM_ITEMS)) {
+                let purchaseDetailList = purchaseDetail.get(SYSTEM_ITEMS);
+                for (let index in purchaseDetailList) {
+                    let purchaseDetailItem = purchaseDetailList[index];
+                    let quoteDetailItem = {};
+                    quoteDetailItem[quoteDetailProductUk] = purchaseDetailItem[inquiryPurchaseProductUk];
+                    quoteDetailItem[quoteDetailProductCountUk] = purchaseDetailItem[inquiryPurchaseProductCountUk];
+                    detail.push(quoteDetailItem);
+                }
+            }
+
+        }
+        quoteItem[quoteDetailUk] = {"items":detail};
+
+        var quoteId = dataRepository.save(context, QUOTE_MODEL_UK, quoteItem);
+
+        // 存在则使用真实主id进行记录更行
+        dataRepository.recordOneToMany(context, INQUIRY_MODEL_UK, requestData.get("_id"), inquiryQuoteUk,SYSTEM_ITEMS, quoteId);
+    }
+
+    dataRepository.commit(context);
+    result = {'success': true, 'data': requestData, 'code': '200'}; 
+} while (false);
+
+result

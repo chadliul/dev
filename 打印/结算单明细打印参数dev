@@ -1,0 +1,92 @@
+$kptz
+$supplier_name
+$supplier_code
+$zdzjzrq ---->$date()
+sum($dmbtr01)----> $sum_sub_dmbtr01
+sum($menge) ----> $sum_sub_menge
+
+子表
+ebeln
+belnr
+ebelp
+maktx
+peinh
+dmbtr07
+kbetr
+menge
+dmbtr02
+dmbtr01
+matnr
+
+
+{
+    "kptz":{
+        "attributeIndex":["724e96ae40f740f682da00247c339f8a"]
+    },
+    "zdzjzrq":{
+        "attributeIndex":["24e6f65a13d548508a163cc603402aaf","$get(\"start\")"],
+        "dataType": "textual"
+    },
+    "supplier_code":{
+        "attributeIndex":[
+            "70a2f1c00b61477c9aee31110b81c4a4",
+            "$first",
+            "8639939268c44e6694bd9c0954ad229c"]
+    },
+    "supplier_name":{
+        "attributeIndex":[
+            "70a2f1c00b61477c9aee31110b81c4a4",
+            "$first",
+            "5afcd7d6b8214b7a867ff9575ee8ec5d"]
+    },
+    "sum_sub_menge":{
+        "attributeIndex":[
+            "473aae306bfd45a09ff13318ad28c001",
+            "$sum",
+            "d1a4e2c2671248439197107f8de96743"]
+    },
+    "sum_sub_dmbtr01":{
+        "attributeIndex":[
+            "473aae306bfd45a09ff13318ad28c001",
+            "$sum",
+            "1a04d44b2acb4253a14f7fc041b0a9c3"]
+    },
+    "sys_sub_info":{
+        "attributeIndex":["473aae306bfd45a09ff13318ad28c001"],
+        "variableBindings":{
+            "ebeln":{
+                "attributeIndex":["2e6db79d462747d4a42eb85f43f2b146"]
+            },
+            "belnr":{
+                "attributeIndex":["440662528728432fbbea741b49a823fb"]
+            },
+            "buzei":{
+                "attributeIndex":["85a2bc4a43294bac9f25fe0565d2b8fc"]
+            },
+            "maktx":{
+                "attributeIndex":["a92afe0e1dd84017b90526bce42b0559"]
+            },
+            "peinh":{
+                "attributeIndex":["28826f357cdc4f8bb3d2d6d4d0797b1e"]
+            },
+            "dmbtr07":{
+                "attributeIndex":["97da913c3c13488bba16bc127210b634"]
+            },
+            "kbetr":{
+                "attributeIndex":["74033690b9184c7cb7170fb3f89070b0"]
+            },
+            "menge":{
+                "attributeIndex":["d1a4e2c2671248439197107f8de96743"]
+            },
+            "dmbtr02":{
+                "attributeIndex":["f3619844635d44bb86e7c183d52c1bab"]
+            },
+            "dmbtr01":{
+                "attributeIndex":["1a04d44b2acb4253a14f7fc041b0a9c3"]
+            },
+            "matnr":{
+                "attributeIndex":["3322ed5475a545a5919f93dbffba791a"]
+            }
+        }
+    }
+}

@@ -1,0 +1,67 @@
+<mxGraphModel dx="1422" dy="797" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+  <root>
+    <object label="" copy="3" id="0">
+      <mxCell />
+    </object>
+    <mxCell id="1" parent="0" />
+    <object label="" band="title" id="0slpldrHIy-i-dwQfAw2-6">
+      <mxCell style="swimlane;startSize=0;" parent="1" vertex="1">
+        <mxGeometry x="30" y="60" width="1090" height="140" as="geometry" />
+      </mxCell>
+    </object>
+    <mxCell id="0slpldrHIy-i-dwQfAw2-20" value="$zvbeln_srm" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;align=left;fontStyle=4;strokeColor=none;" parent="0slpldrHIy-i-dwQfAw2-6" vertex="1">
+      <mxGeometry x="110" y="60" width="260" height="40" as="geometry" />
+    </mxCell>
+  </root>
+</mxGraphModel>
+
+
+
+
+VariableOperators.Let let = VariableOperators.Let.define("likedPostId", "$_id.postId")
+        .and("likerUserId").equalToValue(ObjectId("12345"));
+
+LookupOperation lookupOperation = LookupOperation.newLookup()
+        .from("likes")
+        .let(let)
+        .pipeline(AggregationPipeline.newPipeline(
+                Aggregation.match(Criteria.where("$expr").is(
+                        new Document("$and", Arrays.asList(
+                                new Document("$eq", Arrays.asList("$$likerUserId", "$_id.userId")),
+                                new Document("$eq", Arrays.asList("$$likedPostId", "$_id.postId"))
+                        ))
+                )),
+                Aggregation.project("liked").andExclude("_id")
+        ))
+        .as("liked");
+
+
+Aggregation aggregation = Aggregation.newAggregation(
+Aggregation.match(Criteria.where("username").is("user001")),
+lookupOperation,
+Aggregation.sort(Sort.Direction.DESC, "date"),
+Aggregation.skip(0),
+Aggregation.limit(10)
+);
+
+List<NewFeed> results = mongoTemplate.aggregate(aggregation, "NewFeed", NewFeed.class).getMappedResults();
+
+
+
+public List<Object> test() {
+
+    Aggregation aggregation = Aggregation.newAggregation(
+        
+        p-> new Document("$project",
+                new Document("data",
+                    new Document("$objectToArray","$$ROOT")
+                )     
+            ),
+        unwind("data"),
+        match(Criteria.where("data.v").regex("Mohit Chandani"))     
+
+    ).withOptions(AggregationOptions.builder().allowDiskUse(Boolean.TRUE).build());
+
+    return mongoTemplate.aggregate(aggregation, mongoTemplate.getCollectionName(YOUR_COLLECTION.class), Object.class).getMappedResults();
+
+}

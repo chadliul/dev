@@ -1,0 +1,63 @@
+$cal_totalduction
+=$dmbtr06_sum+$zquality+$zproduction+$zlogistics+$zother
+
+质保金扣除金额-汇总 质量问题索赔扣款  生产问题索赔 物流问题索赔 其它扣款
+
+{
+    "formula":"dmbtr06_sum + zquality + zproduction + zlogistics + zother",
+    "variableBindings":{
+        "dmbtr06_sum":{
+            "attributeIndex":["aa58c700895e476fb75b2d4b3359c270"],
+            "defaultValue":0
+        },
+         "zquality":{
+            "attributeIndex":["fb3f99324d0d46178500e2cbd83b8f75"],
+            "defaultValue":0
+        },
+        "zproduction":{
+            "attributeIndex":["56858062b9e94636840217d4b29d9ee0"],
+            "defaultValue":0
+        },
+        "zlogistics":{
+            "attributeIndex":["ab54db41af4d485589ce5d54ef41af44"],
+            "defaultValue":0
+        },
+        "zother":{
+            "attributeIndex":["47c7f9039a574eb384737a801cd86649"],
+            "defaultValue":0
+        }
+    }
+}
+
+$cal_shouldpayamount
+=$dmbtr01_sum-($dmbtr06_sum+$zquality+$zproduction+$zlogistics+$zother)
+
+{
+    "formula":"dmbtr01_sum - dmbtr06_sum - zquality - zproduction - zlogistics - zother",
+    "variableBindings":{
+        "dmbtr01_sum":{
+            "attributeIndex":["2b86c5bfe72c40dfbb48dd8dc4190347"],
+            "defaultValue":0
+        },
+        "dmbtr06_sum":{
+            "attributeIndex":["aa58c700895e476fb75b2d4b3359c270"],
+            "defaultValue":0
+        },
+         "zquality":{
+            "attributeIndex":["fb3f99324d0d46178500e2cbd83b8f75"],
+            "defaultValue":0
+        },
+        "zproduction":{
+            "attributeIndex":["56858062b9e94636840217d4b29d9ee0"],
+            "defaultValue":0
+        },
+        "zlogistics":{
+            "attributeIndex":["ab54db41af4d485589ce5d54ef41af44"],
+            "defaultValue":0
+        },
+        "zother":{
+            "attributeIndex":["47c7f9039a574eb384737a801cd86649"],
+            "defaultValue":0
+        }
+    }
+}

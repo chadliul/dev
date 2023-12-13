@@ -1,0 +1,107 @@
+// 批量创建月度水电费
+
+// 水电模型
+var shuidian_model_uk = "7c0dacefc49945f98b3c0d0bfda683bc";
+// 企业模型
+var corp_model_uk = "503a2b1bfdc04bda93f8c2a0f5c260a1";
+var corp_model_name_uk = "30b824a9c3e749b49bb49d8c6ebb06b2";
+var corp_model_dianfei_type_uk = "a41d8434153a49b599bc4b06d81c228a";
+var corp_shuidian_detail_uk = "595577e8d954413fba20abe232eff3e7";
+var corp_zhangdan_uk = "796c90e924654d07adb08167b567f1c1";
+var dianfeidanjia_model_price_uk = "9575a474a3da46ecabcc97951973fdbb";
+var corp_shuifei_type = "633c14003f5d440eb0fd29ae3d6a6568";
+var shuifeidanjia_model_price_uk = "26922b25968d4e8b9e86f969d425446b";
+// 入驻企业
+var corp_uk = "76ed16033b3b480085e2dbaa645ef834";
+
+// 公司名称
+var corp_name_uk = "bill_corp_name";
+// 
+var dianfei_type_uk = "01c83a97e31e4352b3d97b6d673b44a0";
+
+var dianfei_unit_price_uk = "dianfei_unit_price";
+
+var month_uk = "bill_month";
+
+var shuifei_type_uk = "d86e66895ed94c80a4d658bff7ee45e2";
+var shuifei_unit_price_uk = "shuifei_unit_price";
+
+var requestData = args.request.data;
+var result;
+do {
+    var date = new Date();
+    var offset = 8 * 60 * 60 * 1000;
+    var cstTimestamp = date.getTime() + offset;
+    var cstDate = new Date(cstTimestamp);
+    
+    var year = cstDate.getFullYear();
+    var month = cstDate.getMonth();
+    var utcFirstDay = new Date(year, month , 1 , 0 , 0 , 0 , 0);
+    var firstDayTimestamp = utcFirstDay.getTime() - offset;
+    console.log("firstDayTimestamp is " + firstDayTimestamp);
+
+    // 查询是否已存在当前日期结果
+    var shuidianQueryMap = { '1ebe170120a74300b8dd3f3d19f01025' :{'$eq' : firstDayTimestamp}};
+    var queryShuidianData = dataQuery.query(context, shuidian_model_uk,shuidianQueryMap);
+    let shuidianItems = queryShuidianData.get('content');
+    if (shuidianItems != null && shuidianItems.size() > 0) {
+        console.log("shuidianItems is " + shuidianItems.size());
+        result = {'success': false, 'code': '409', 'message': '当月已生成水电费。'};
+        break;
+    }
+
+
+    // query 公司，需要确认状态
+    var queryMap = {'_states' : {'$eq' : 'st0x8D1VHEhqyhkb'}};
+    var queryCorpData = dataQuery.query(context, corp_model_uk,queryMap);
+
+    console.log("queryCorpData content is " +  typeof queryCorpData.get('content'));
+    let corpItems = queryCorpData.get('content');
+    // 超过多条，异常
+    if (corpItems == null || corpItems.size() == 0) {
+        console.log("corpItems element is empty.");
+        result = {'success': true, 'code': '200', 'message': 'corp is empty.'};
+        break;
+    }
+
+    dataRepository.begin(context);
+    for(let index in corpItems) {
+        let corpItem = corpItems[index];
+        if (!corpItem.get(corp_zhangdan_uk)) {
+            continue;
+        }
+        let shuidianItem = {};
+        // 取公司信息
+        shuidianItem[corp_uk]=corpItem;
+        // 取公司名
+        shuidianItem[corp_name_uk] = corpItem.get(corp_model_name_uk);
+        shuidianItem[month_uk] = {'start' : firstDayTimestamp, 'end' : firstDayTimestamp};
+        // 取电费类型引用
+        shuidianItem[dianfei_type_uk] = corpItem.get(corp_model_dianfei_type_uk);
+        // 取电费单价
+        if (corpItem.get(corp_model_dianfei_type_uk) 
+        && corpItem.get(corp_model_dianfei_type_uk)[0] 
+        && corpItem.get(corp_model_dianfei_type_uk)[0].get(dianfeidanjia_model_price_uk)) {
+            shuidianItem[dianfei_unit_price_uk] = corpItem.get(corp_model_dianfei_type_uk)[0].get(dianfeidanjia_model_price_uk);
+        }
+        // 取水费
+        shuidianItem[shuifei_type_uk] = corpItem.get(corp_shuifei_type);
+        // 取水费单价
+        if (corpItem.get(corp_shuifei_type) 
+        && corpItem.get(corp_shuifei_type)[0] && corpItem.get(corp_shuifei_type)[0].get(shuifeidanjia_model_price_uk)) {
+            shuidianItem[shuifei_unit_price_uk] = corpItem.get(corp_shuifei_type)[0].get(shuifeidanjia_model_price_uk);
+        }
+        // 生命周期
+        shuidianItem['_lifecycleInstance'] = {'status':'WAITING','states':[{'uniqueKey':'st0xtQcbqNvuciyr','status':'WAITING','activities':[]}]};
+
+        var shuidianId = dataRepository.save(context, shuidian_model_uk, shuidianItem);
+        // 企业表中增加水电记录
+        dataRepository.recordOneToMany(context, corp_model_uk, corpItem.get("_id"), corp_shuidian_detail_uk,"items", shuidianId);
+
+    }
+
+    dataRepository.commit(context);
+    result = {'success': true,'code': '200','data':requestData}; 
+} while (false);
+
+result

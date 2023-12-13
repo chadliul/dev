@@ -1,0 +1,168 @@
+// 发送请求，供应商审核
+var SUPPLIER_MODEL_UK = "facd9b98cdc24534acf2c5ba51480676";
+var DATA_ID = "_id";
+var SYSTEM_MODEL = "_modelUniqueKey";
+var SYSTEM_VERSION = "_version";
+var SYSTEM_CONTENT = "content";
+var SUPPLIER_GROUP_ALIAS = "supplierAccountGrp";
+var SUPPLIER_BANKS_ALIAS = "banks";
+var ITEMS_ATTRIBUTE_NAME = "items";
+var ITEMS_BANKT_ALIAS = "bkont";
+var ITEMS_ISBILL_ALIAS = "isBillBank";
+var REQUEST_SIGN_API_NAME = "sendApi";
+var UNIQUE_TAX = "taxNo1";
+var SUPPLIER_TYPE_ENUM = {
+    'cee68c41e90c49c39425432700aa334b': 'ZR01',
+    '4f96fa1579d045d88b44be4db952b14b': 'ZR02',
+    '411504970b474ab8ba67bd7322ac7cd3': 'ZR03',
+    '38e228d40b1d4458872285738679d6ac': 'ZR04',
+    'dcb9ce7c1b6940b980834ee00a24e02a': 'ZR05',
+    '5cd8c534248647d39ccca784fda6d995': 'ZR06',
+    '14dc05a8027645af9b9a175fcd61b995': 'ZR07',
+    'f0fe44f3f3b04188ac2c8d4683ce7718': 'ZR08',
+    '91af0989e8654fadb5db2e4d7e2df0de': 'ZR09',
+    '0b14faeb846946bab8671d057220c90a':'Z003'
+}
+var BANK_CONTROL_ENUM = {
+    '2386e3e3d63b4fb492f381df96a6b1e4' : '10',
+    'e0ee670fb44b44bdbb6af8dd58236d07' : '20'
+}
+var REQUEST_API = "http://gateway.xinri.com:9233/test/centre/csrm/autmSupplier";
+var PRO_REQUEST_API = "http://gateway.xinri.com:9233/pro/centre/csrm/autmSupplier";
+var RESPONSE_CODE = "code";
+var RESPONSE_RESULT = "result";
+var RESPONSE_SUCCESS = "000";
+
+var requestData = args.request.data;
+var preview = args.preview;
+var result;
+
+// 枚举需要特殊处理
+do {
+    // 唯一标识，不存在则返回
+    if (!requestData[DATA_ID]) {
+        result = {'success': false, 'code': '40001','message': 'dataId 为空'};
+        break; 
+    }
+    
+    // dataid查询主表
+    var supAliasRes = dataQuery.findById(context, SUPPLIER_MODEL_UK, requestData[DATA_ID]);
+    var supAliasDto = supAliasRes[SYSTEM_CONTENT];
+    if (supAliasDto === void 0 ) {
+        result = {'success': false, 'code': '40001','message': '供应商报名数据为空'};
+        break; 
+    }
+ 
+    let supplierRequestDto = {};
+    // 拼装request
+    for (let supKey in supAliasDto) {
+        if (supKey === SUPPLIER_GROUP_ALIAS) {
+            console.log("supKey is " + supKey);
+            let typeUKList = supAliasDto.get(supKey);
+            let typeUK = typeUKList.get(0);
+            // 已替换value
+            supplierRequestDto[SUPPLIER_GROUP_ALIAS] = typeUK;
+        } else if (supKey === SUPPLIER_BANKS_ALIAS) {
+            var itemsMap = supAliasDto.get(supKey);
+            var itemsList = itemsMap.get(ITEMS_ATTRIBUTE_NAME);
+            // 拼接item
+            let requestBankList = [];
+            for (var index in itemsList) {
+                let requestBank = {};
+                let element = itemsList.get(index);
+                for (let itemKey in element) {
+                    if (itemKey === ITEMS_BANKT_ALIAS) {
+                        let bankcontrolUKList = element.get(itemKey);
+                        let bankcontrolUK = bankcontrolUKList.get(0);
+                        // 已替换value
+                        let bankcontrolValue = bankcontrolUK;
+                        requestBank[itemKey] = bankcontrolValue;
+                    } else if (itemKey === ITEMS_ISBILL_ALIAS) {
+                        if (element.get(itemKey)) {
+                            requestBank[itemKey] = 1;
+                        } else {
+                            requestBank[itemKey] = 0;
+                        }
+                    } else {
+                        requestBank[itemKey] = element.get(itemKey);
+                    }
+                }
+                requestBankList.push(requestBank);
+            };
+            supplierRequestDto[supKey] = requestBankList;
+        } else {
+            supplierRequestDto[supKey] = supAliasDto.get(supKey);
+        }
+    }
+    
+    var timestamp = new Date().getTime();
+    var signMap = {
+        'requestBody': supplierRequestDto,
+        'timestamp' : timestamp
+    }
+
+    var signValue = tools.sign(context, REQUEST_SIGN_API_NAME, signMap);
+    console.log("sign is " + signValue);
+
+    var requestHeader = {
+        "XR-CLIENT-ID" : "HYPER",
+        "XR-TIMESTAMP" : timestamp,
+        "XR-SIGN" : signValue
+    };
+
+    console.log("request header is " + JSON.stringify(requestHeader));
+    console.log("supplierRequestDto is " + JSON.stringify(supplierRequestDto));
+    var response;
+    // start to request
+    if (preview === 'false') {
+        response = httpClient.exchange(PRO_REQUEST_API, 'POST', requestHeader, JSON.stringify(supplierRequestDto));
+    } else {
+        response = httpClient.exchange(REQUEST_API, 'POST', requestHeader, JSON.stringify(supplierRequestDto));
+    }
+    
+    console.log("response is " + response);
+
+    if (!response) {
+        result = {'success': false, 'code': '40001','message': '请求未响应'};
+        break; 
+    }
+
+    dataRepository.begin(context);
+
+    var updateMap = {
+    }
+    updateMap[DATA_ID] = requestData[DATA_ID];
+    updateMap[SYSTEM_MODEL] = requestData[SYSTEM_MODEL];
+    // 全局唯一识别号，需添加
+    updateMap[UNIQUE_TAX] = supAliasDto.get(UNIQUE_TAX);
+    if (requestData[SYSTEM_VERSION]) {
+        updateMap[SYSTEM_VERSION] = requestData[SYSTEM_VERSION];
+    }
+    var responseMap = JSON.parse(response);
+    var auditRes;
+    if (responseMap[RESPONSE_CODE] === RESPONSE_SUCCESS) {
+        console.log("response result is " + responseMap[RESPONSE_RESULT]);
+        // supAliasRes.put('code',responseMap[RESPONSE_RESULT]);
+        updateMap['code'] = responseMap[RESPONSE_RESULT];
+    
+        // todo 状态变成审核成功
+        auditRes = Boolean("true");
+        dataRepository.update(context, SUPPLIER_MODEL_UK,requestData[DATA_ID], updateMap);
+    } else {
+        // 审核异常
+        result = {'success': false, 'code': '40001','message': responseMap['mes']};
+        break; 
+    }
+
+    var res = dataRepository.commit(context);
+    if (res) {
+        context.runtimeContext.put('autmSupplier', auditRes);
+        result = {'success': true, 'code': '200','data': requestData};
+    } else {
+        result = {'success': false, 'code': '40002','message': '事务执行失败'};
+    }
+
+} while (false);
+
+// 结果输出
+result

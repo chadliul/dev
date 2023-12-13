@@ -1,0 +1,108 @@
+var SUPPLIER_MODEL_UK = "facd9b98cdc24534acf2c5ba51480676";
+var TENANT_ID = "1148f762-5348-11ed-8f0b-00163e1c5a46";
+var REQUEST_API = "http://account-service.default.svc.cluster.local:7001/rest/sso/account";
+var WORKSPACE_API = "http://workspace-service.default.svc.cluster.local:7001/rest/client/role?tenantId=";
+
+var objectData = args.objectData[0];
+var result;
+var requestHeader = {
+    "content-type": "application/json"
+};
+
+var preview = args.preview;
+
+do {
+    if (objectData == null) {
+        console.log("objectData is null.");
+        result = {'success': false, 'code': '40001','message': "object is null"};
+        break;
+    }
+
+    // request account
+    var code = objectData.get('code');
+    var requestBody = {
+    "name": code,
+    "tenantId": TENANT_ID
+    };
+
+    var userResponse = httpClient.exchange(REQUEST_API, 'POST', requestHeader, JSON.stringify(requestBody));
+    if (userResponse == void 0) {
+        console.log("create account user error.");
+        result = {'success': false, 'code': '40001','message': "create account error. userId is null"};
+        break;
+    }
+    var userIdRes = JSON.parse(userResponse);
+    var userId = userIdRes['content'];
+
+    // add role
+    var dataId = objectData.get("_id");
+    var roleRequestMap = {};
+    var assignSelf = {
+        "userId": userId,
+        "dataId": dataId,
+        "sourceModelUniqueKey": SUPPLIER_MODEL_UK,
+        "attributeUniqueKey": "_dataId"
+    };
+    roleRequestMap['44d1d2b2beda432383a3f1976c2722b1'] = assignSelf;
+
+    var role1 = {
+        "userId": userId,
+        "dataId": dataId,
+        "sourceModelUniqueKey": SUPPLIER_MODEL_UK,
+        "attributeUniqueKey": "866c7ddd75d14489a3fb926d0fcab83a"
+    };
+    roleRequestMap['8a984c1d9a5b40a8b8c9aa5d760119fb'] = role1;
+    var role2 = {
+        "userId": userId,
+        "dataId": dataId,
+        "sourceModelUniqueKey": SUPPLIER_MODEL_UK,
+        "attributeUniqueKey": "a9446e86b7714babbc4a510fcfa0b8d5"
+    };
+    roleRequestMap['9b05e0f3f2e24d019a22210b48ac46fa'] = role2;
+    var role3 = {
+        "userId": userId,
+        "dataId": dataId,
+        "sourceModelUniqueKey": SUPPLIER_MODEL_UK,
+        "attributeUniqueKey": "ed8fd66c341c4a5a8eb1329379f50bb6"
+    };
+    roleRequestMap['0ed76197dd56407d8339ba81e9d16a5e'] = role3;
+    var role4 = {
+        "userId": userId,
+        "dataId": dataId,
+        "sourceModelUniqueKey": SUPPLIER_MODEL_UK,
+        "attributeUniqueKey": "f6e9657831434afea5f3c40c5e867865"
+    };
+    roleRequestMap['6708a3d9581c42d7ba7e5d90c8932d44'] = role4;
+    var role5 = {
+        "userId": userId,
+        "dataId": dataId,
+        "sourceModelUniqueKey": SUPPLIER_MODEL_UK,
+        "attributeUniqueKey": "39a01ee2cb7342828b483cfc12f9983e"
+    };
+    roleRequestMap['c9554f1e076e4195891c4b9556eee056'] = role5;
+    var role6 = {
+        "userId": userId,
+        "dataId": dataId,
+        "sourceModelUniqueKey": SUPPLIER_MODEL_UK,
+        "attributeUniqueKey": "418b0e1924ff486eb92bbd355a07e28e"
+    };
+    roleRequestMap['df4ff9f0e29e480785b05c1543a3a53b'] = role6;
+    var role7 = {
+        "userId": userId,
+        "dataId": dataId,
+        "sourceModelUniqueKey": SUPPLIER_MODEL_UK,
+        "attributeUniqueKey": "2eb3e56089214b098eab2a7b79ec737c"
+    };
+    roleRequestMap['c86a90c4c9bd47d59b81ac7ad4b90291'] = role7;
+
+    var roleResult = httpClient.exchange(WORKSPACE_API + TENANT_ID + "&preview=" + preview, 'POST', requestHeader, JSON.stringify(roleRequestMap));
+    if (roleResult == void 0 || roleResult === 'false') {
+        console.log("roleResult is null or false.");
+        result = {'success': false, 'code': '40001','message': "roleResult is null or false."};
+    } else {
+        result = {'success': true, 'code': '200','data': roleResult};;
+    }
+
+} while (false);
+
+result
