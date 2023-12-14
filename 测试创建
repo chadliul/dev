@@ -5,7 +5,6 @@ var order_detail_uk = "6acb1fca844f44e2817d5eceb9396d3a";
 // 下单中商品货号
 var order_text_uk = "a702b0288845478d9aab3faecc5bc7dd";
 
-
 var SYSTEM_ITMES = "items";
 var SYSTEM_ID = "_id";
 var SYSTEM_MODEL = "_modelUniqueKey";
@@ -18,7 +17,6 @@ var orderData = args.request.data;
 var result;
 do {
 
-    //dataRepository.begin(context);
     // 全部是创建
     var orderItemMap = {};
     orderItemMap[order_text_uk] = "jstest2";
@@ -27,9 +25,7 @@ do {
     console.log("order is " + JSON.stringify(orderItemMap));
     var createOrderId = dataRepository.save(context, order_model_uk, orderItemMap);
 
-    //dataRepository.commit(context);
     result = {'success': true, 'code': '200'}; 
 } while (false);
 
 result
-
