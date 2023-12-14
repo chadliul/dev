@@ -43,12 +43,12 @@ do {
     dataRepository.recordOneToMany(context, order_model_uk, createOrderId, order_detail_uk, "items",detailItemId);
     }
 
-    var updateItem = {};
-    updateItem['_version'] = 1;
-    var updateId = '65080a83748012524d7cb164';
-    updateItem[SYSTEM_ID] = updateId;
-    updateItem[orderDetail_text_uk] = "orderDetail js updateTest.";
-    dataRepository.update(context, orderDetail_model_uk, updateId, updateItem);
+    //var updateItem = {};
+    //updateItem['_version'] = 1;
+    //var updateId = '65080a83748012524d7cb164';
+    //updateItem[SYSTEM_ID] = updateId;
+    //updateItem[orderDetail_text_uk] = "orderDetail js updateTest.";
+    //dataRepository.update(context, orderDetail_model_uk, updateId, updateItem);
 
     //dataRepository.commit(context);
     result = {'success': true, 'code': '200'}; 
